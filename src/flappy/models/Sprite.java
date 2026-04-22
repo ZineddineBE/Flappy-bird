@@ -8,6 +8,8 @@ public abstract class Sprite {
     protected int x;
     protected int y;
     protected int largeur = 100;
+    protected int vitesse;
+    protected Color couleur;
 
     public abstract void dessiner(Graphics2D dessin) throws IOException;
     public abstract void deplacement();
@@ -77,5 +79,21 @@ public abstract class Sprite {
 
     public void setLargeur(int largeur) {
         this.largeur = largeur;
+    }
+
+    public Color getCouleur() {
+        return couleur;
+    }
+
+    public void setCouleur(Color couleur) {
+        this.couleur = couleur;
+    }
+
+    public int getVitesse() {
+        return vitesse;
+    }
+
+    public void setVitesse(int vitesse) {
+        this.vitesse = vitesse;
     }
 }

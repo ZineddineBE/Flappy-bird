@@ -15,6 +15,8 @@ public class Oiseau extends Sprite {
 
     public Oiseau() {
         largeur = 50;
+        vitesse = 25;
+
         try {
             // On ne charge l'image qu'UNE SEULE FOIS ici
             imageOiseau = ImageIO.read(new File("src/img/Flappy-Bird.png"));
@@ -32,8 +34,13 @@ public class Oiseau extends Sprite {
         gravite += 0.2f;
     }
 
+    public void deplacementHorizontal(int vitesse) {
+        x += vitesse;
+    }
+
     public void sauter() {
         gravite = -5f;
     }
+
 
 }

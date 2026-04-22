@@ -10,18 +10,22 @@ public class Tuyau extends Sprite {
     protected int ecartement = 150;
     protected int marge = 50;
     protected int vitesse = 5;
+    protected int pointDeVie = 3;
+    protected Color couleurStroke = Color.black;
+
 
     public Tuyau() {
         largeur = 100;
+        couleur = new Color(43, 176, 25);
     }
 
     public void dessiner(Graphics2D dessin) {
-        dessin.setColor(Color.green);
+        dessin.setColor(couleur);
         dessin.fillRect(x, y, largeur, Principal.HAUTEUR_FENETRE);
         dessin.fillRect(x, y - ecartement - Principal.HAUTEUR_FENETRE, largeur, Principal.HAUTEUR_FENETRE);
 
-        dessin.setColor(Color.black);
-        dessin.setStroke(new BasicStroke(1.0f));
+        dessin.setColor(couleurStroke);
+        dessin.setStroke(new BasicStroke(3.0f));
 
         dessin.drawRect(x, y, largeur, Principal.HAUTEUR_FENETRE);
         dessin.drawRect(x, y - ecartement - Principal.HAUTEUR_FENETRE, largeur, Principal.HAUTEUR_FENETRE);
@@ -31,9 +35,27 @@ public class Tuyau extends Sprite {
         x -= vitesse;
 
         if (x < - largeur) {
-            x = 800;
-            y = Utils.aleatoire(marge + ecartement, Principal.HAUTEUR_FENETRE-marge);
+            resetTuyau();
         }
+    }
+
+    public void toucheParProjectile() {
+        pointDeVie --;
+
+        if (pointDeVie == 2) {
+            couleur = Color.ORANGE;
+        } else if (pointDeVie == 1) {
+            couleur = Color.RED;
+        } else if (pointDeVie == 0) {
+            resetTuyau();
+        }
+    }
+
+    public void resetTuyau(){
+        x = Principal.LARGEUR_FENETRE;
+        y = Utils.aleatoire(marge + ecartement, Principal.HAUTEUR_FENETRE-marge);
+        pointDeVie = 3;
+        couleur = new Color(43, 176, 25);
     }
 
     @Override

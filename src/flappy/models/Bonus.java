@@ -10,7 +10,8 @@ import java.io.IOException;
 
 public class Bonus extends Sprite {
 
-    private Image imageBonus;
+    protected Image imageBonus;
+    protected Image image100Pts;
 
     public Bonus() {
         x = Principal.LARGEUR_FENETRE;
@@ -18,6 +19,7 @@ public class Bonus extends Sprite {
         largeur = 25;
         try {
             imageBonus = ImageIO.read(new File("src/img/KC.png"));
+            image100Pts = ImageIO.read(new File("src/img/100pts.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -29,5 +31,13 @@ public class Bonus extends Sprite {
 
     public void deplacement() {
         x -= 6;
+    }
+
+    public Image getImageBonus() {
+        return imageBonus;
+    }
+
+    public void setImageBonus(Graphics2D dessin, Image imageBonus) {
+        this.imageBonus = imageBonus;
     }
 }

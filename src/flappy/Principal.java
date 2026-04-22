@@ -3,14 +3,19 @@ package flappy;
 import flappy.models.*;
 import flappy.utils.Utils;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 
-public class Principal extends Canvas implements KeyListener {
+public class Principal extends Canvas implements KeyListener, MouseListener{
 
     public static final int LARGEUR_FENETRE = 800;
     public static final int HAUTEUR_FENETRE = 600;
@@ -20,12 +25,15 @@ public class Principal extends Canvas implements KeyListener {
     private Tuyau tuyau = new Tuyau();
     private Nuage[] nuages = new Nuage[10];
     private ArrayList<Bonus> listeBonus = new ArrayList<>();
+    private CopyOnWriteArrayList<Projectile> listeProjectiles = new CopyOnWriteArrayList<>();
 
     private boolean pause = false;
 
     private int score = 0;
 
     private int iteration = 0;
+
+    private long dernierTir = 0;
 
     public Principal() throws InterruptedException, IOException {
 
@@ -36,6 +44,7 @@ public class Principal extends Canvas implements KeyListener {
         this.setBounds(0, 0, LARGEUR_FENETRE, HAUTEUR_FENETRE);
 
         fenetre.addKeyListener(this);
+        this.addMouseListener(this);
 
         JPanel panel = new JPanel();
         panel.add(this);
@@ -81,10 +90,22 @@ public class Principal extends Canvas implements KeyListener {
                     bonus.deplacement();
                     if(oiseau.testCollision(bonus)) {
                         score += 100;
-                        bonusTouche.add(bonus);
+                        bonus.setImageBonus(dessin, ImageIO.read(new File("src/img/100pts.png")));
+                        //bonusTouche.add(bonus);
                     }
                 }
                 listeBonus.removeAll(bonusTouche);
+
+                for(Projectile projectile : listeProjectiles) {
+                    projectile.deplacement();
+
+                    if(tuyau.testCollision(projectile)) {
+                        tuyau.toucheParProjectile();
+                        listeProjectiles.remove(projectile);
+                    }else if(projectile.getX() > LARGEUR_FENETRE) {
+                        listeProjectiles.remove(projectile);
+                    }
+                }
 
                 oiseau.deplacement();
                 tuyau.deplacement();
@@ -100,6 +121,7 @@ public class Principal extends Canvas implements KeyListener {
 
             for(Nuage nuage : nuages) nuage.dessiner(dessin);
             for(Bonus bonus : listeBonus) bonus.dessiner(dessin);
+            for(Projectile projectile : listeProjectiles) projectile.dessiner(dessin);
 
             tuyau.dessiner(dessin);
             oiseau.dessiner(dessin);
@@ -125,6 +147,7 @@ public class Principal extends Canvas implements KeyListener {
         score = 0;
         iteration = 0;
         listeBonus.clear();
+        listeProjectiles.clear();
 
         oiseau = new Oiseau();
         oiseau.setX(200);
@@ -140,7 +163,6 @@ public class Principal extends Canvas implements KeyListener {
             nuage.setLargeur(Utils.aleatoire(30, 200));
         }
 
-        // 4. On débloque la pause en DERNIER
         pause = false;
     }
 
@@ -189,6 +211,7 @@ public class Principal extends Canvas implements KeyListener {
 
     @Override
     public void keyReleased(KeyEvent e) {
+
         if(e.getKeyCode() == KeyEvent.VK_SPACE) {
             oiseau.sauter();
         }
@@ -199,6 +222,53 @@ public class Principal extends Canvas implements KeyListener {
             }
         }
 
+        if(e.getKeyCode() == KeyEvent.VK_Q) {
+            if(oiseau.getX() > oiseau.getLargeur()) {
+                oiseau.deplacementHorizontal(-oiseau.getVitesse());
+            }
+        }
+
+        if(e.getKeyCode() == KeyEvent.VK_D) {
+            if(oiseau.getX() < LARGEUR_FENETRE + oiseau.getLargeur()) {
+                oiseau.deplacementHorizontal(oiseau.getVitesse());
+            }
+        }
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+
+        if(e.getButton() == MouseEvent.BUTTON1) {
+            if(!pause){
+                long tempsActuel = System.currentTimeMillis();
+                Projectile projectile = new Projectile(oiseau.getX(), oiseau.getY());
+                if(tempsActuel - dernierTir >= projectile.getDelaiTir()) {
+                    listeProjectiles.add(projectile);
+                    dernierTir = tempsActuel;
+
+                }
+            }
+        }
+
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
 
     }
 }
